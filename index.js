@@ -12,7 +12,7 @@ mongoose.connect(process.env.MONGO_URL)
 
 // TEST ROUTE
 app.get("/", (req, res) => {
-    res.send("🚀 Arkanet backend + MongoDB OK");
+    res.send("🚀 -Arkanet-backend + MongoDB OK");
 });
 
 app.listen(3000, () => {

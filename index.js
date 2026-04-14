@@ -5,16 +5,29 @@ const app = express();
 
 app.use(express.json());
 
-// 🔌 CONNECT MONGODB
-mongoose.connect(process.env.MONGO_URL)
-.then(() => console.log("✅ MongoDB connecté"))
-.catch(err => console.log(err));
+// 🔍 Vérifier si la variable est bien chargée
+console.log("MONGO_URL =", process.env.MONGO_URL);
 
-// TEST ROUTE
-app.get("/", (req, res) => {
-    res.send("🚀 -Arkanet-backend + MongoDB OK");
+// 🔌 CONNEXION MONGODB
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => {
+    console.log("✅ MongoDB connecté");
+})
+.catch((err) => {
+    console.log("❌ Erreur MongoDB :", err);
 });
 
-app.listen(3000, () => {
-    console.log("Serveur lancé");
+// 🌐 ROUTE TEST
+app.get("/", (req, res) => {
+    res.send("🚀 Arkanet backend + MongoDB OK");
+});
+
+// 🚀 LANCEMENT SERVEUR
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Serveur lancé sur le port ${PORT}`);
 });

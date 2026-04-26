@@ -5,17 +5,13 @@ const app = express();
 
 app.use(express.json());
 
-// 🔍 Vérifier si la variable est bien chargée
+// 🔍 DEBUG
 console.log("MONGO_URL =", process.env.MONGO_URL);
 
 // 🔌 CONNEXION MONGODB
 mongoose.connect(process.env.MONGO_URL)
-.then(() => {
-    console.log("✅ MongoDB connecté");
-})
-.catch((err) => {
-    console.log("❌ Erreur MongoDB :", err);
-});
+.then(() => console.log("✅ MongoDB connecté"))
+.catch(err => console.log("❌ Erreur MongoDB :", err));
 
 // 📦 MODÈLE UTILISATEUR
 const User = mongoose.model("User", {
@@ -37,6 +33,8 @@ app.get("/", (req, res) => {
 // 🔐 ROUTE INSCRIPTION
 app.post("/register", async (req, res) => {
     try {
+        console.log("📩 DONNÉES REÇUES :", req.body);
+
         const {
             nom,
             postnom,
@@ -48,13 +46,19 @@ app.post("/register", async (req, res) => {
             password
         } = req.body;
 
-        // Vérifier si email existe déjà
+        // ❗ Vérification champs
+        if (!nom || !postnom || !prenom || !birthdate || !lieu || !phone || !email || !password) {
+            return res.json({ message: "❌ Tous les champs sont obligatoires" });
+        }
+
+        // 🔍 Vérifier email existant
         const exist = await User.findOne({ email });
 
         if (exist) {
             return res.json({ message: "❌ Email déjà utilisé" });
         }
 
+        // 💾 ENREGISTREMENT
         const user = new User({
             nom,
             postnom,
@@ -68,10 +72,12 @@ app.post("/register", async (req, res) => {
 
         await user.save();
 
+        console.log("✅ UTILISATEUR ENREGISTRÉ");
+
         res.json({ message: "✅ Inscription réussie" });
 
     } catch (err) {
-        console.log(err);
+        console.log("❌ ERREUR :", err);
         res.status(500).json({ message: "Erreur serveur" });
     }
 });
@@ -80,5 +86,5 @@ app.post("/register", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Serveur lancé sur le port ${PORT}`);
+    console.log("Serveur lancé sur le port " + PORT);
 });
